@@ -267,9 +267,28 @@ function tryWrapHtmlCode(text: string) {
     );
 }
 
+function formatBoldText(text: string) {
+  const pattern = /\*\*(.*?)([:：])\*\*/g;
+  return text.replace(pattern, (match, boldText, colon) => {
+    return `**${boldText}**${colon}`;
+  });
+}
+function formatThinkText(text: string) {
+  const pattern = /^<think>([\s\S]*?)<\/think>/;
+  return text.replace(pattern, (match, thinkContent) => {
+    const formattedContent = thinkContent.split('\n').map((line: string) => `>${line}`).join('\n');
+    return `${formattedContent}\n`;
+  });
+}
+
+
 function _MarkDownContent(props: { content: string }) {
   const escapedContent = useMemo(() => {
-    return tryWrapHtmlCode(escapeBrackets(props.content));
+    return tryWrapHtmlCode(
+      formatThinkText(
+        formatBoldText(escapeBrackets(props.content)),
+      ),
+    );
   }, [props.content]);
 
   return (
